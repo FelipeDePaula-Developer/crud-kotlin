@@ -1,5 +1,7 @@
 package com.example.thinkot_2.forms
 
+import com.example.thinkot_2.entities.Credential
+import com.example.thinkot_2.entities.PhoneNumber
 import org.springframework.stereotype.Component
 
 @Component

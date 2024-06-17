@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 data class PhoneNumber(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var idphone: Int? = null,
+    var idPhoneNumber : Int? = null,
 
     @ManyToOne
     @JoinColumn(name = "idclient", referencedColumnName = "idclient")

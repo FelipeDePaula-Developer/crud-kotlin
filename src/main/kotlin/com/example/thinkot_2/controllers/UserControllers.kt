@@ -10,9 +10,9 @@ class UserControllers {
 
 
     @PostMapping("cad/user")
-    public fun cadUser(@RequestBody UserForm:UserForm){
+    fun cadUser(@RequestBody UserForm:UserForm){
         try {
-
+            println("RECEBIDO");
         }catch (_:Exception){
 
         }

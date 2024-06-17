@@ -46,7 +46,7 @@ services:
     volumes:
       - dbsonarqube_data:/var/lib/postgresql/data
 
-  kotlin-app:
+  thinkot:
     build: .
     depends_on:
       - postgres
