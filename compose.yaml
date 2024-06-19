@@ -45,7 +45,6 @@ services:
       retries: 2
     volumes:
       - dbsonarqube_data:/var/lib/postgresql/data
-
   thinkot:
     build: .
     depends_on:
@@ -56,6 +55,9 @@ services:
       SPRING_DATASOURCE_PASSWORD: secret
     ports:
       - "8080:8080"
+    volumes:
+      - ./src:/app/src
+      - ./pom.xml:/app/pom.xml
 
 volumes:
   sonarqube_data:

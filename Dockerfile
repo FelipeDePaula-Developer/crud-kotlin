@@ -26,5 +26,11 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 COPY --from=build /app/target/thinkot_2-0.0.1-SNAPSHOT.jar thinkot_2.jar
-# Definir o comando para executar a aplicação/
-CMD ["java", "-jar", "thinkot_2.jar"]
+# Instalar Maven no ambiente de execução
+RUN apt-get update && apt-get install -y maven
+
+# Adicionar um script de inicialização que compila o código e executa a aplicação
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+CMD ["/app/entrypoint.sh"]
