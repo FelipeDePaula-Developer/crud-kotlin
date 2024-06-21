@@ -29,7 +29,7 @@ data class PhoneNumber(
     @Column(length = 2, name = "phone_type")
     var phoneType: String? = null,
 
-    @Column(columnDefinition = "CHAR default 'T'", length = 1)
+    @Column(columnDefinition = "CHAR(1) default 'T'", length = 1)
     var status: String? = "T",
 
     @Column(columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP", name = "insert_timestampp")

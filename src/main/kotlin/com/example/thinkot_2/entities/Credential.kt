@@ -13,10 +13,10 @@ data class Credential(
     @Column
     var password: String? = null,
 
-    @Column(columnDefinition = "CHAR default 'T'", length = 1, nullable = false)
+    @Column(columnDefinition = "CHAR(1) default 'T'", length = 1, nullable = false)
     var status: String? = "T",
 
-    @Column(columnDefinition = "CHAR default 'F'", length = 1, nullable = false)
+    @Column(columnDefinition = "CHAR(1) default 'F'", length = 1, nullable = false)
     var logged: String? = null,
 
     @ManyToOne

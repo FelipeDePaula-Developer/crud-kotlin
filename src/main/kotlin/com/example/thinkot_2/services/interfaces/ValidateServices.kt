@@ -8,9 +8,13 @@ interface ValidateServices {
         return Pattern.matches(regexEmail, email)
     }
 
-    fun checkCPF(cpf: String): Boolean {
-        var cpf = cpf
-        cpf = cpf.replace("\\D+".toRegex(), "")
+    fun checkCPF(cpf: String?): Boolean {
+
+        if (cpf == null){
+            return false
+        }
+
+        val cpf = cpf.replace("\\D+".toRegex(), "")
         val regexCPF = "^\\d{11}$"
         return Pattern.matches(regexCPF, cpf)
     }
@@ -26,7 +30,7 @@ interface ValidateServices {
     }
 
     fun checkDDI(phoneDDI: String?): Boolean {
-        val regexDDI = "^(?:\\d{1,4}\\s?)?\\(?\\d{1,4}\\)?\\s?\\d{6,}$"
+        val regexDDI = "^(?:\\d{1,4}\\s?)?(?:\\(?\\d{1,4}\\)?\\s?)?\\d{1,}$"
         return Pattern.matches(regexDDI, phoneDDI)
     }
 
@@ -40,7 +44,7 @@ interface ValidateServices {
         return Pattern.matches(regexNumber, phoneNumber)
     }
 
-    fun checkTypeNumber(typeNumber: String): Boolean {
+    fun checkTypeNumber(typeNumber: String?): Boolean {
         val types = ArrayList<String>()
         types.add("RE")
         types.add("CO")

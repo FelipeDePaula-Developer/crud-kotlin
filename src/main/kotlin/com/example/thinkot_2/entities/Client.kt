@@ -17,13 +17,13 @@ data class Client(
     @Column
     var email: String? = null,
 
-    @Column(columnDefinition = "CHAR", length = 10)
+    @Column(length = 10)
     var cpf: String? = null,
 
-    @Column(columnDefinition = "CHAR default 'T'", length = 1, nullable = false)
-    var status: String? = "T",
+    @Column(columnDefinition = "CHAR(1) default 'T'", nullable = false)
+    var status: String = "T",
 
-    @Column(columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP", name = "insert_timestampp")
+    @Column(name = "insert_timestampp", columnDefinition = "TIMESTAMP default CURRENT_TIMESTAMP")
     @CreationTimestamp
     var insertTimestamp: LocalDateTime? = null
 )
