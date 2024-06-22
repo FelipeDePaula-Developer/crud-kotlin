@@ -2,6 +2,7 @@ package com.example.thinkot_2.entities
 
 import jakarta.persistence.*
 
+@Entity
 data class Credential(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,7 +17,7 @@ data class Credential(
     @Column(columnDefinition = "CHAR(1) default 'T'", length = 1, nullable = false)
     var status: String? = "T",
 
-    @Column(columnDefinition = "CHAR(1) default 'F'", length = 1, nullable = false)
+    @Column(columnDefinition = "CHAR(1) default 'F'", length = 1)
     var logged: String? = null,
 
     @ManyToOne
