@@ -9,14 +9,27 @@ interface ValidateServices {
     }
 
     fun checkCPF(cpf: String?): Boolean {
+        if (cpf.isNullOrEmpty()) return false
 
-        if (cpf == null){
-            return false
+        val cleanedCpf = cpf.replace("\\D+".toRegex(), "")
+        if (cleanedCpf.length != 11) return false
+
+        val firstPartCpf = cleanedCpf.take(9)
+        val firstVerifyDigitCpf = calculateVerifyDigit(firstPartCpf, 2)
+
+        val secondPartCpf = firstPartCpf + firstVerifyDigitCpf
+        val secondVerifyDigitCpf = calculateVerifyDigit(secondPartCpf, 2)
+
+        val verifyNumbers = "$firstVerifyDigitCpf$secondVerifyDigitCpf"
+        return verifyNumbers == cleanedCpf.takeLast(2)
+    }
+
+    fun calculateVerifyDigit(cpfPart: String, startMultiplier: Int): Int {
+        val sum = cpfPart.reversed().foldIndexed(0) { index, acc, char ->
+            acc + char.digitToInt() * (startMultiplier + index)
         }
-
-        val cpf = cpf.replace("\\D+".toRegex(), "")
-        val regexCPF = "^\\d{11}$"
-        return Pattern.matches(regexCPF, cpf)
+        val modulo = sum % 11
+        return if (modulo >= 2) 11 - modulo else 0
     }
 
     fun checkPassword(password: String?): Boolean {
