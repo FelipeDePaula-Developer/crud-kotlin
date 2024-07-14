@@ -21,7 +21,7 @@ class UserControllers(private val userServices: UserServices, private val userRe
         return if (userFormResult.hasErrors()){
             ResponseEntity(userFormResult.getAllErrors(), HttpStatus.BAD_REQUEST)
         }else{
-            userRepository.save(userForm.user)
+            userRepository.saveOrUpdateByCPF(userForm.user)
             credentialRepository.save(userForm.credential)
             phoneNumberRepository.saveAll(userForm.phone)
             ResponseEntity("Validation passed", HttpStatus.OK)
