@@ -24,7 +24,4 @@ data class Credential(
     @JoinColumn(name = "iduser", referencedColumnName = "iduser")
     var user: User? = null,
 
-    @ManyToOne
-    @JoinColumn(name = "idclient", referencedColumnName = "idclient")
-    val client: Client? = null
 )

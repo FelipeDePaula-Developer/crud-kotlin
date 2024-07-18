@@ -5,6 +5,7 @@ import com.example.thinkot_2.forms.results.UserFormResult
 import com.example.thinkot_2.repositories.CredentialRepository
 import com.example.thinkot_2.repositories.PhoneNumberRepository
 import com.example.thinkot_2.repositories.UserRepository
+import com.example.thinkot_2.services.CredentialServices
 import com.example.thinkot_2.services.PhoneNumberServices
 import com.example.thinkot_2.services.UserServices
 import org.springframework.http.HttpStatus
@@ -15,8 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 class UserControllers(private val userServices: UserServices,
-                      private val userRepository: UserRepository,
-                      private val credentialRepository: CredentialRepository,
+                      private val credentialServices: CredentialServices,
                       private val phoneNumberRepository: PhoneNumberRepository) {
     @PostMapping("cad/user")
     fun cadUser(@RequestBody userForm: UserForm): ResponseEntity<Any> {
@@ -25,9 +25,15 @@ class UserControllers(private val userServices: UserServices,
         return if (userFormResult.hasErrors()){
             ResponseEntity(userFormResult.getAllErrors(), HttpStatus.BAD_REQUEST)
         }else{
-            userServices.saveOrUpdateByCpf(userForm.user)
-            credentialRepository.save(userForm.credential)
+            val savedUser = userServices.saveOrUpdateByCpf(userForm.user)
+
+            userForm.phone.forEach() { phone ->
+                phone.user = savedUser
+            }
             phoneNumberRepository.saveAll(userForm.phone)
+
+            userForm.credential.user = savedUser
+            credentialServices.saveCredential(userForm.credential)
             ResponseEntity("Validation passed", HttpStatus.OK)
         }
     }

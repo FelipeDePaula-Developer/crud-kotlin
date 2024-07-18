@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service
 class UserServices(
     @Autowired private val userRepository: UserRepository,
     @Autowired private val phoneNumberServices: PhoneNumberServices,
-    @Autowired private val credentialService: CredentialService
+    @Autowired private val credentialServices: CredentialServices
 ) : UserServicesInterface,
     PhoneServicesInterface {
 
@@ -45,7 +45,7 @@ class UserServices(
             }
         }
 
-        if (!credentialService.loginExists(userForm.credential)) {
+        if (!credentialServices.loginExists(userForm.credential)) {
 
             val retCredential: Map<String, String> = validateCredential(userForm.credential);
             retCredential.forEach() { (campo, erro) ->
@@ -60,15 +60,18 @@ class UserServices(
     }
 
     @Transactional
-    fun saveOrUpdateByCpf(user: User) {
+    fun saveOrUpdateByCpf(user: User) : User {
         val existingUser = user.cpf?.let { userRepository.findByCpf(it) }
+        val savedUser : User;
         if (existingUser != null) {
             existingUser.name = user.name
             existingUser.email = user.email
             existingUser.status = user.status
-            userRepository.save(existingUser)
+           savedUser = userRepository.save(existingUser)
         } else {
-            userRepository.save(user)
+           savedUser = userRepository.save(user)
         }
+
+        return savedUser
     }
 }

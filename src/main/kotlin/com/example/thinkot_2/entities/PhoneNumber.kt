@@ -10,10 +10,6 @@ data class PhoneNumber(
     var idPhoneNumber : Int? = null,
 
     @ManyToOne
-    @JoinColumn(name = "idclient", referencedColumnName = "idclient")
-    var client: Client? = null,
-
-    @ManyToOne
     @JoinColumn(name = "iduser", referencedColumnName = "iduser")
     var user: User? = null,
 
