@@ -15,25 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class UserControllers(private val userServices: UserServices,
-                      private val credentialServices: CredentialServices,
-                      private val phoneNumberRepository: PhoneNumberRepository) {
+class UserControllers(private val userServices: UserServices) {
     @PostMapping("cad/user")
     fun cadUser(@RequestBody userForm: UserForm): ResponseEntity<Any> {
-        val userFormResult: UserFormResult = userServices.validateUserForm(userForm);
+        val userFormResult: UserFormResult = userServices.registerUser(userForm);
 
         return if (userFormResult.hasErrors()){
             ResponseEntity(userFormResult.getAllErrors(), HttpStatus.BAD_REQUEST)
         }else{
-            val savedUser = userServices.saveOrUpdateByCpf(userForm.user)
-
-            userForm.phone.forEach() { phone ->
-                phone.user = savedUser
-            }
-            phoneNumberRepository.saveAll(userForm.phone)
-
-            userForm.credential.user = savedUser
-            credentialServices.saveCredential(userForm.credential)
             ResponseEntity("Validation passed", HttpStatus.OK)
         }
     }

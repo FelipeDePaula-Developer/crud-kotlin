@@ -3,20 +3,45 @@ package com.example.thinkot_2.services
 import com.example.thinkot_2.entities.User
 import com.example.thinkot_2.forms.UserForm
 import com.example.thinkot_2.forms.results.UserFormResult
+import com.example.thinkot_2.repositories.CredentialRepository
+import com.example.thinkot_2.repositories.PhoneNumberRepository
 import com.example.thinkot_2.repositories.UserRepository
 import com.example.thinkot_2.services.interfaces.PhoneServicesInterface
 import com.example.thinkot_2.services.interfaces.UserServicesInterface
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
 
 @Service
 class UserServices(
     @Autowired private val userRepository: UserRepository,
     @Autowired private val phoneNumberServices: PhoneNumberServices,
-    @Autowired private val credentialServices: CredentialServices
+    @Autowired private val credentialServices: CredentialServices,
+    private val phoneNumberRepository: PhoneNumberRepository,
 ) : UserServicesInterface,
     PhoneServicesInterface {
+
+    @Transactional
+    fun registerUser(userForm: UserForm): UserFormResult {
+        val userFormResult: UserFormResult = validateUserForm(userForm)
+
+        if (userFormResult.hasErrors()) {
+            return userFormResult
+        }
+
+        val savedUser = saveOrUpdateByCpf(userForm.user)
+        userForm.phone.forEach() { phone ->
+            phone.user = savedUser
+        }
+        phoneNumberRepository.saveAll(userForm.phone)
+
+        userForm.credential.user = savedUser
+        credentialServices.saveCredential(userForm.credential)
+
+        return userFormResult
+    }
 
     fun validateUserForm(userForm: UserForm): UserFormResult {
         val userFormResult = UserFormResult();
@@ -59,7 +84,6 @@ class UserServices(
         return userFormResult;
     }
 
-    @Transactional
     fun saveOrUpdateByCpf(user: User) : User {
         val existingUser = user.cpf?.let { userRepository.findByCpf(it) }
         val savedUser : User;

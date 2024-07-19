@@ -2,6 +2,7 @@ package com.example.thinkot_2.services
 
 import com.example.thinkot_2.entities.Credential
 import com.example.thinkot_2.repositories.CredentialRepository
+import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
