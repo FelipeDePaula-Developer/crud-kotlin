@@ -1,6 +1,7 @@
 package com.example.thinkot_2.services
 
 import com.example.thinkot_2.entities.Credential
+import com.example.thinkot_2.forms.AuthUserForm
 import com.example.thinkot_2.repositories.CredentialRepository
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,7 +18,7 @@ class CredentialServices(@Autowired private val credentialRepository: Credential
     private val ALGORITHM = "PBKDF2WithHmacSHA512";
     private val ITERATIONS = 120_000
     private val KEY_LENGTH = 256
-    private val SECRET = "SomeRandomSecret"
+    private val SECRET = "zxYtQ4oc_EDIKNq"
 
     private fun ByteArray.toHexString(): String =
         HexFormat.of().formatHex(this)
@@ -34,7 +35,7 @@ class CredentialServices(@Autowired private val credentialRepository: Credential
         return salt.toHexString();
     }
 
-    fun generateHash(password: String, salt: String): String {
+    fun generateHash(password: String, salt: String?): String {
         val combinedSalt = "$salt$SECRET".toByteArray()
         val factory: SecretKeyFactory = SecretKeyFactory.getInstance(ALGORITHM)
         val spec: KeySpec = PBEKeySpec(password.toCharArray(), combinedSalt, ITERATIONS, KEY_LENGTH)
@@ -45,7 +46,19 @@ class CredentialServices(@Autowired private val credentialRepository: Credential
 
     fun saveCredential(credential: Credential){
         val salt = generateRandomSalt()
+        credential.salt = salt
         credential.password = generateHash(credential.password ?: "empty", salt)
         credentialRepository.save(credential)
+    }
+
+    fun authenticate(authUserForm: AuthUserForm):Boolean{
+        val credential = credentialRepository.findByLogin(authUserForm.login)
+
+        if (credential == null) {
+            return false
+        }
+
+        val hashedPassword = generateHash(authUserForm.password, credential.salt)
+        return hashedPassword == credential.password
     }
 }

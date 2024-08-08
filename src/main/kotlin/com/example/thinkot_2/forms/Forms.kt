@@ -11,3 +11,8 @@ data class UserForm(
     var phone: List<PhoneNumber> = emptyList(),
     var credential: Credential = Credential()
 )
+
+data class AuthUserForm(
+    var login: String,
+    var password: String
+)

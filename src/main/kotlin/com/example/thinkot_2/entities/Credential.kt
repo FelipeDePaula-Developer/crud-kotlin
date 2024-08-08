@@ -14,6 +14,9 @@ data class Credential(
     @Column
     var password: String? = null,
 
+    @Column(nullable = false)
+    var salt: String? = null,
+
     @Column(columnDefinition = "CHAR(1) default 'T'", length = 1, nullable = false)
     var status: String? = "T",
 
