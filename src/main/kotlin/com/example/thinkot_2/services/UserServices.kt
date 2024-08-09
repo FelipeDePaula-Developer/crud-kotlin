@@ -1,8 +1,11 @@
 package com.example.thinkot_2.services
 
+import com.example.thinkot_2.entities.PhoneNumber
 import com.example.thinkot_2.entities.User
+import com.example.thinkot_2.entities.interfaces.Person
+import com.example.thinkot_2.forms.ClientForm
 import com.example.thinkot_2.forms.UserForm
-import com.example.thinkot_2.forms.results.UserFormResult
+import com.example.thinkot_2.forms.results.PersonFormResult
 import com.example.thinkot_2.repositories.CredentialRepository
 import com.example.thinkot_2.repositories.PhoneNumberRepository
 import com.example.thinkot_2.repositories.UserRepository
@@ -24,11 +27,11 @@ class UserServices(
     PhoneServicesInterface {
 
     @Transactional
-    fun registerUser(userForm: UserForm): UserFormResult {
-        val userFormResult: UserFormResult = validateUserForm(userForm)
+    fun registerUser(userForm: UserForm): PersonFormResult {
+        val personFormResult: PersonFormResult = validateUserForm(userForm)
 
-        if (userFormResult.hasErrors()) {
-            return userFormResult
+        if (personFormResult.hasErrors()) {
+            return personFormResult
         }
 
         val savedUser = saveOrUpdateByCpf(userForm.user)
@@ -40,22 +43,44 @@ class UserServices(
         userForm.credential.user = savedUser
         credentialServices.saveCredential(userForm.credential)
 
-        return userFormResult
+        return personFormResult
+    }
+    
+    fun registerClient(clientForm: ClientForm):PersonFormResult{
+        val personFormResult: PersonFormResult = validateCommomFields(clientForm.client, clientForm.phone)
+        if ()
     }
 
-    fun validateUserForm(userForm: UserForm): UserFormResult {
-        val userFormResult = UserFormResult();
+    fun validateUserForm(userForm: UserForm): PersonFormResult {
+        val personFormResult = validateCommomFields(userForm.user, userForm.phone)
 
-        val retUser: Map<String, String> = validateUser(userForm.user);
+        if (!credentialServices.loginExists(userForm.credential)) {
+
+            val retCredential: Map<String, String> = validateCredential(userForm.credential);
+            retCredential.forEach() { (campo, erro) ->
+                personFormResult.addUserError(campo, erro)
+            }
+        } else {
+            personFormResult.addUserError("duplicate_login", "O login ${userForm.credential.login} já está em uso")
+        }
+
+
+        return personFormResult;
+    }
+
+    fun validateCommomFields(person: Person,  phone: List<PhoneNumber>) : PersonFormResult{
+        val personFormResult = PersonFormResult();
+
+        val retUser: Map<String, String> = validatePerson(person);
 
         retUser.forEach() { (campo, erro) ->
-            userFormResult.addUserError(campo, erro)
+            personFormResult.addUserError(campo, erro)
         }
 
         var skipPhoneValidation = false;
-        userForm.phone.forEach { phoneNumber ->
+        phone.forEach { phoneNumber ->
             if (phoneNumberServices.phoneNumberExists(phoneNumber)) {
-                userFormResult.addUserError(
+                personFormResult.addUserError(
                     "duplicate_number",
                     "Combinação de DDI (${phoneNumber.phoneDDI}), DDD (${phoneNumber.phoneDDD}) e Numero ${phoneNumber.phoneNumber} já existem na base de dados"
                 )
@@ -64,24 +89,13 @@ class UserServices(
         }
 
         if (!skipPhoneValidation) {
-            val retPhones: Map<String, String> = validatePhones(userForm.phone);
+            val retPhones: Map<String, String> = validatePhones(phone);
             retPhones.forEach() { (campo, erro) ->
-                userFormResult.addUserError(campo, erro)
+                personFormResult.addUserError(campo, erro)
             }
         }
 
-        if (!credentialServices.loginExists(userForm.credential)) {
-
-            val retCredential: Map<String, String> = validateCredential(userForm.credential);
-            retCredential.forEach() { (campo, erro) ->
-                userFormResult.addUserError(campo, erro)
-            }
-        } else {
-            userFormResult.addUserError("duplicate_login", "O login ${userForm.credential.login} já está em uso")
-        }
-
-
-        return userFormResult;
+        return personFormResult
     }
 
     fun saveOrUpdateByCpf(user: User) : User {

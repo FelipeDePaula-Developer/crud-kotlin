@@ -2,7 +2,7 @@ package com.example.thinkot_2.forms.results
 
 data class ValidationError(val field: String, val message: String)
 
-class UserFormResult {
+class PersonFormResult {
     private val userErrors: MutableList<ValidationError> = mutableListOf()
     private val credentialErrors: MutableList<ValidationError> = mutableListOf()
     private val phoneErrors: MutableList<ValidationError> = mutableListOf()

@@ -1,14 +1,14 @@
 package com.example.thinkot_2.entities
 
 import com.example.thinkot_2.entities.interfaces.Person
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
 import org.hibernate.annotations.CreationTimestamp
 import java.time.LocalDateTime
 
-@Entity
-@Table(name = "app_user")
-data class User(
-
+data class Client(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var idUser: Int? = null,
@@ -28,4 +28,4 @@ data class User(
 
     @Column(length = 1, nullable = false)
     var status: String = "T"
-) : Person
+):Person
