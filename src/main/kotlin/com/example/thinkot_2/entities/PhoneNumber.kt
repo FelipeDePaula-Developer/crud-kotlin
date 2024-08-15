@@ -13,6 +13,10 @@ data class PhoneNumber(
     @JoinColumn(name = "iduser", referencedColumnName = "iduser")
     var user: User? = null,
 
+    @ManyToOne
+    @JoinColumn(name = "idclient", referencedColumnName = "idclient")
+    var client: Client? = null,
+
     @Column(length = 3, name = "phone_ddi")
     var phoneDDI: String? = null,
 

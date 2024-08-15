@@ -1,11 +1,13 @@
 package com.example.thinkot_2.services
 
+import com.example.thinkot_2.entities.Client
 import com.example.thinkot_2.entities.PhoneNumber
 import com.example.thinkot_2.entities.User
 import com.example.thinkot_2.entities.interfaces.Person
 import com.example.thinkot_2.forms.ClientForm
 import com.example.thinkot_2.forms.UserForm
 import com.example.thinkot_2.forms.results.PersonFormResult
+import com.example.thinkot_2.repositories.ClientRepository
 import com.example.thinkot_2.repositories.CredentialRepository
 import com.example.thinkot_2.repositories.PhoneNumberRepository
 import com.example.thinkot_2.repositories.UserRepository
@@ -13,6 +15,7 @@ import com.example.thinkot_2.services.interfaces.PhoneServicesInterface
 import com.example.thinkot_2.services.interfaces.UserServicesInterface
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.CrudRepository
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Service
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service
 @Service
 class UserServices(
     @Autowired private val userRepository: UserRepository,
+    @Autowired private val clientRepository: ClientRepository,
     @Autowired private val phoneNumberServices: PhoneNumberServices,
     @Autowired private val credentialServices: CredentialServices,
     private val phoneNumberRepository: PhoneNumberRepository,
@@ -34,7 +38,7 @@ class UserServices(
             return personFormResult
         }
 
-        val savedUser = saveOrUpdateByCpf(userForm.user)
+        val savedUser = saveOrUpdateByCPF(userForm.user, userRepository) { cpf -> userRepository.findByCpf(cpf) }
         userForm.phone.forEach() { phone ->
             phone.user = savedUser
         }
@@ -45,10 +49,21 @@ class UserServices(
 
         return personFormResult
     }
-    
+
+    @Transactional
     fun registerClient(clientForm: ClientForm):PersonFormResult{
         val personFormResult: PersonFormResult = validateCommomFields(clientForm.client, clientForm.phone)
-        if ()
+        if (personFormResult.hasErrors()){
+            return personFormResult
+        }
+
+        val savedClient = saveOrUpdateByCPF(clientForm.client, clientRepository) { cpf -> clientRepository.findByCpf(cpf) }
+        clientForm.phone.forEach() { phone ->
+            phone.client = savedClient
+        }
+
+        phoneNumberRepository.saveAll(clientForm.phone)
+        return personFormResult
     }
 
     fun validateUserForm(userForm: UserForm): PersonFormResult {
@@ -98,18 +113,19 @@ class UserServices(
         return personFormResult
     }
 
-    fun saveOrUpdateByCpf(user: User) : User {
-        val existingUser = user.cpf?.let { userRepository.findByCpf(it) }
-        val savedUser : User;
-        if (existingUser != null) {
-            existingUser.name = user.name
-            existingUser.email = user.email
-            existingUser.status = user.status
-           savedUser = userRepository.save(existingUser)
+    fun <T> saveOrUpdateByCPF(
+        entity: T,
+        repository: CrudRepository<T, Int>,
+        findByCpf: (String) -> T?
+    ): T where T : Person {
+        val existingEntity = entity.cpf?.let { findByCpf(it) }
+        return if (existingEntity != null) {
+            existingEntity.name = entity.name
+            existingEntity.email = entity.email
+            existingEntity.status = entity.status
+            repository.save(existingEntity)
         } else {
-           savedUser = userRepository.save(user)
+            repository.save(entity)
         }
-
-        return savedUser
     }
 }

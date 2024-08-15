@@ -27,5 +27,5 @@ data class User(
     override var name: String? = null,
 
     @Column(length = 1, nullable = false)
-    var status: String = "T"
+    override var status: String? = "T"
 ) : Person
